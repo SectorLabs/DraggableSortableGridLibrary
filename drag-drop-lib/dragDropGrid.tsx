@@ -155,6 +155,7 @@ export class DragDropGrid extends React.Component<props, state> {
             panHandlers={this._panResponder && this._panResponder.panHandlers}
             delayLongPress={this.dragActivationThreshold}
             onLongPress={
+                //@ts-ignore
                 (this.props.disabledBlockIndices || []).includes(key)
                   ? () => {}
                   : this.activateDrag(key)
@@ -272,7 +273,7 @@ export class DragDropGrid extends React.Component<props, state> {
             let distance = this._getDistanceTo(blockPosition);
 
             //condition to avoid "+" block
-          
+
               //condition to check whether block has come close to any other block
               if (distance < closestDistance && distance < this.state.blockWidth) {
                 closest = index;
@@ -283,7 +284,7 @@ export class DragDropGrid extends React.Component<props, state> {
                     var arr1 = [];
                     if (closest != mergeBlock) {
                       //if already an mergeblock exist get it to actual size
-                     
+
                       if (mergeBlock != null) {
                         Animated.spring(bp[mergeBlock].pop, {
                           toValue: 0,
@@ -291,7 +292,7 @@ export class DragDropGrid extends React.Component<props, state> {
                           friction: 3
                         }).start();
                       }
-                    
+
                       arr1.push(
                         Animated.spring(bp[activeBlock].hoverPop, {
                           toValue: -1,
@@ -331,6 +332,7 @@ export class DragDropGrid extends React.Component<props, state> {
 
         //this is for reposition animation
         if (closest !== activeBlock) {
+          //@ts-ignore
           if (this.props.disabledBlockIndices.includes(closest)) {
             return;
           }

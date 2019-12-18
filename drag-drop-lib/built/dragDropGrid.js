@@ -5,13 +5,24 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -163,6 +174,10 @@ var DragDropGrid = /** @class */ (function (_super) {
                         });
                     //this is for reposition animation
                     if (closest_1 !== activeBlock) {
+                        //@ts-ignore
+                        if (_this.props.disabledBlockIndices.includes(closest_1)) {
+                            return;
+                        }
                         var date = new Date();
                         var timestamp = date.getTime();
                         var increment_1 = _this.itemOrder[closest_1].order < _this.itemOrder[activeBlock].order ? -1 : 1;
@@ -552,36 +567,40 @@ var DragDropGrid = /** @class */ (function (_super) {
                 _this._getBlock(key).origin.y) /
                 50;
         };
-        _this._getBlockStyle = function (key) { return [
-            {
-                width: _this.state.blockWidth,
-                height: _this.state.blockHeight,
-                justifyContent: 'center'
-            },
-            _this._blockPositionsSet() && {
-                position: 'absolute',
-                top: _this._getBlock(key).currentPosition.getLayout().top,
-                left: _this._getBlock(key).currentPosition.getLayout().left,
-                transform: [
-                    {
-                        scale: _this._getBlock(key).pop.interpolate({
-                            inputRange: [-1, 0, 1],
-                            outputRange: [0.5, 1, 1]
-                        })
-                    },
-                    {
-                        translateY: _this._getBlock(key).pop.interpolate({
-                            inputRange: [-1, 0, 1],
-                            outputRange: [-1 * 50, 0, 0]
-                        })
-                    }
-                ]
-            },
-            _this.state.activeBlock == key && _this._blockActivationWiggle(key),
-            _this.state.activeBlock == key && { zIndex: 1 },
-            _this.state.deleteBlock != null && { zIndex: 2 },
-            _this.state.deleteBlock == key && { opacity: _this.state.deleteBlockOpacity },
-        ]; };
+        _this._getBlockStyle = function (key) {
+            // This is needed for RTL support
+            var directionalLayout = {};
+            if (_this._blockPositionsSet()) {
+                directionalLayout = react_native_1.I18nManager.isRTL
+                    ? { right: _this._getBlock(key).currentPosition.getLayout().left }
+                    : { left: _this._getBlock(key).currentPosition.getLayout().left };
+            }
+            return [
+                {
+                    width: _this.state.blockWidth,
+                    height: _this.state.blockHeight,
+                    justifyContent: 'center'
+                },
+                _this._blockPositionsSet() && __assign(__assign({ position: 'absolute', top: _this._getBlock(key).currentPosition.getLayout().top }, directionalLayout), { transform: [
+                        {
+                            scale: _this._getBlock(key).pop.interpolate({
+                                inputRange: [-1, 0, 1],
+                                outputRange: [0.5, 1, 1]
+                            })
+                        },
+                        {
+                            translateY: _this._getBlock(key).pop.interpolate({
+                                inputRange: [-1, 0, 1],
+                                outputRange: [-1 * 50, 0, 0]
+                            })
+                        }
+                    ] }),
+                _this.state.activeBlock == key && _this._blockActivationWiggle(key),
+                _this.state.activeBlock == key && { zIndex: 1 },
+                _this.state.deleteBlock != null && { zIndex: 2 },
+                _this.state.deleteBlock == key && { opacity: _this.state.deleteBlockOpacity },
+            ];
+        };
         _this.state = {
             gridLayout: null,
             random: null,
@@ -642,7 +661,11 @@ var DragDropGrid = /** @class */ (function (_super) {
         return (<react_native_1.Animated.View style={this._getGridStyle()} onLayout={this.assessGridSize} key={this.blockPositions}>
         {this.state.gridLayout &&
             this.blockPositions &&
-            this.items.map(function (item, key) { return (<Tile_1.default key={key} style={_this._getBlockStyle(key)} onLayout={_this.saveBlockPositions(key)} panHandlers={_this._panResponder && _this._panResponder.panHandlers} delayLongPress={_this.dragActivationThreshold} onLongPress={_this.activateDrag(key)} onPress={_this.handleTap(item.props, key)} itemWrapperStyle={_this._getItemWrapperStyle(key)} inactive={false}>
+            this.items.map(function (item, key) { return (<Tile_1.default key={key} style={_this._getBlockStyle(key)} onLayout={_this.saveBlockPositions(key)} panHandlers={_this._panResponder && _this._panResponder.panHandlers} delayLongPress={_this.dragActivationThreshold} onLongPress={
+            //@ts-ignore
+            (_this.props.disabledBlockIndices || []).includes(key)
+                ? function () { }
+                : _this.activateDrag(key)} onPress={_this.handleTap(item.props, key)} itemWrapperStyle={_this._getItemWrapperStyle(key)} inactive={false}>
             {item}
           </Tile_1.default>); })}
       </react_native_1.Animated.View>);
