@@ -33,6 +33,7 @@ interface props {
   style?: any;
   onMerge?:any
   merge?: any;
+  disabledBlockIndices?: number[];
 }
 
 interface state{
@@ -153,7 +154,11 @@ export class DragDropGrid extends React.Component<props, state> {
             onLayout={this.saveBlockPositions(key)}
             panHandlers={this._panResponder && this._panResponder.panHandlers}
             delayLongPress={this.dragActivationThreshold}
-            onLongPress={this.activateDrag(key)}
+            onLongPress={
+                (this.props.disabledBlockIndices || []).includes(key)
+                  ? () => {}
+                  : this.activateDrag(key)
+            }
             onPress={this.handleTap(item.props, key)}
             itemWrapperStyle={this._getItemWrapperStyle(key)}
             inactive={false}
@@ -326,6 +331,9 @@ export class DragDropGrid extends React.Component<props, state> {
 
         //this is for reposition animation
         if (closest !== activeBlock) {
+          if (this.props.disabledBlockIndices.includes(closest)) {
+            return;
+          }
           var date = new Date();
           var timestamp = date.getTime();
           const increment =
