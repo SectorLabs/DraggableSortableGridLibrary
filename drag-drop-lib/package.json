@@ -1,6 +1,6 @@
 {
   "name": "@sector-labs/react-native-drag-drop-grid-library",
-  "version": "1.0.4-sl.1",
+  "version": "1.0.4-sl.2",
   "description": "A react-native Drag Drop Grid library works animations are similar to android default launcher app ",
   "main": "built/index.js",
   "types": "index.ts",
